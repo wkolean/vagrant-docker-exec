@@ -1,0 +1,5 @@
+.vagrant
+Gemfile.lock
+Vagrantfile
+Vagrantfile.proxy
+www

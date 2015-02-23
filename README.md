@@ -22,6 +22,7 @@ vagrant plugin install vagrant-docker-exec
 vagrant docker-exec [options] [container] -- [command] [args]
 ```
 --[no-]detach Run in the background
+
 -t, --[no-]tty Open an interactive shell
 
 To create a new file in a container named `nginx`
@@ -36,7 +37,7 @@ To open an interactive shell in a conatiner named `nginx`
 vagrant docker-exec -t nginx -- bash
 ```
 
-To simplify opening a shell, use the shortcut `vagrant docker-shell [container]`
+To simplify opening a shell, you can use the shortcut `vagrant docker-shell [container]`
 
 ## Author
 William Kolean william.kolean@gmail.com

@@ -1,6 +1,10 @@
 module VagrantPlugins
   module DockerExec
     class Command < Vagrant.plugin("2", "command")
+      def self.synopsis
+        "run a new command in a running docker container"
+      end
+
       def execute
         options = {}
         options[:detach] = false

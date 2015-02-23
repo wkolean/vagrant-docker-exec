@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = VagrantPlugins::DockerExec::VERSION
   spec.authors       = ["William Kolean"]
   spec.email         = ["william.kolean@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{docker-exec runs a new command in a running container.}
+  spec.description   = %q{Vagrant plugin adding the command docker-exec [options] container -- [command] which invokes `docker exec` to run a command in a running container.}
   spec.homepage      = ""
   spec.license       = "MIT"
 

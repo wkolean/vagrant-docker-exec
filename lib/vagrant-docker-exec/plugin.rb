@@ -8,6 +8,7 @@ module VagrantPlugins
   module DockerExec
     class Plugin < Vagrant.plugin("2")
       name "docker-exec"
+      description "The vagrant-docker-exec plugin lets you run commands in a docker container"
 
       command "docker-exec" do
         require_relative "command/exec"

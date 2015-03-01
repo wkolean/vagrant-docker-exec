@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["william.kolean@gmail.com"]
   spec.summary       = %q{docker-exec runs a new command in a running container.}
   spec.description   = %q{Vagrant plugin adding the command docker-exec [options] container -- [command] which invokes `docker exec` to run a command in a running container.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/wkolean/vagrant-docker-exec"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

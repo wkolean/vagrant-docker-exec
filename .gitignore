@@ -3,3 +3,4 @@ Gemfile.lock
 Vagrantfile
 Vagrantfile.proxy
 www
+pkg

@@ -65,7 +65,7 @@ module VagrantPlugins
 
         exec_cmd = %W(docker exec)
         exec_cmd << "-i" << "-t" if options[:pty]
-        exec_cmd << options[:name]
+        exec_cmd << machine.name.to_s
         exec_cmd += options[:extra_args] if options[:extra_args]
         exec_cmd.concat(command)
 
@@ -73,10 +73,10 @@ module VagrantPlugins
         exec_options = options
         exec_options[:stdin] = true if options[:pty]
 
+        #@env.ui.info(exec_cmd.flatten)
+
         output = ""
-        machine.provider.driver.execute(*cmd, exec_options) do |type, data|
-          output += data
-        end
+        machine.provider.driver.execute(*exec_cmd, exec_options)
 
       end
 

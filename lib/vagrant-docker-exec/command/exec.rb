@@ -76,7 +76,12 @@ module VagrantPlugins
         #@env.ui.info(exec_cmd.flatten)
 
         output = ""
-        machine.provider.driver.execute(*exec_cmd, exec_options)
+        machine.provider.driver.execute(*exec_cmd, exec_options) do |type, data|
+          output += data
+        end
+
+        output_options = {}
+        machine.ui.output(output.chomp!, **output_options) if !output.empty?
 
       end
 

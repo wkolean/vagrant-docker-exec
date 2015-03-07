@@ -1,3 +1,7 @@
+## 0.1.3 (March 7, 2015)
+
+* Exec commands now use machine id and no longer expects a container name
+
 ## 0.1.2 (March 5, 2015)
 
 * Exec commands terminal output is now diplayed

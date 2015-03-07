@@ -50,7 +50,7 @@ module VagrantPlugins
 
         with_target_vms(argv, target_opts) do |machine|
           if machine.state.id != :running
-            @env.ui.info("#{machine.name} is not running.")
+            @env.ui.info("#{machine.id} is not running.")
             next
           end
 
@@ -65,7 +65,7 @@ module VagrantPlugins
 
         exec_cmd = %W(docker exec)
         exec_cmd << "-i" << "-t" if options[:pty]
-        exec_cmd << machine.name.to_s
+        exec_cmd << machine.id.to_s
         exec_cmd += options[:extra_args] if options[:extra_args]
         exec_cmd.concat(command)
 

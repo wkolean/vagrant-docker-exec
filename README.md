@@ -7,14 +7,12 @@ Docker exec requires Docker 1.3.0 or higher. On non-Linux system, the docker in 
 You can find more information on setting up a custom docker host on the [Vagrant blog](http://www.vagrantup.com/blog/feature-preview-vagrant-1-6-docker-dev-environments.html) but basically, create Vagrantfile.proxy:
 
 ```ruby
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-Vagrant.configure(2) do |config|
+Vagrant.configure("2") do |config|
   config.vm.box = "phusion/ubuntu-14.04-amd64"
   config.vm.provision "docker"
-  config.vm.network :forwarded_port, host: 80, guest: 80
+  config.vm.network :forwarded_port, host: 8080, guest: 8080
   config.vm.provider :virtualbox do |vb|
-    vb.name = "docker-exec-proxy"
+    vb.name = "docker-proxy"
   end
 end
 ```
@@ -22,16 +20,11 @@ end
 And then use the vagrant_vagrantfile setting to reference your custom host in your Vagrantfile:
 
 ```ruby
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-Vagrant.configure(2) do |config|
-  config.vm.define "nginx" do |v|
-    v.vm.provider "docker" do |d|
-      d.image   = "dockerfile/nginx"
-      d.ports   = ["80:80"]
-      d.name    = "nginx"
-      d.vagrant_vagrantfile = "./Vagrantfile.proxy"
-    end
+Vagrant.configure("2") do |config|
+  config.vm.provider "docker" do |d|
+    d.image   = "dockerfile/nginx"
+    d.ports   = ["8080:80"]
+    d.vagrant_vagrantfile = "./Vagrantfile.proxy"
   end
 end
 ```
@@ -50,9 +43,9 @@ A common use case for the exec command is to open a new shell in a running conat
 vagrant docker-shell [container]
 ```
 
-If you're running a docker host, then you are running in a multi-host environment and the container name is required, even if only one docker container is running.
+In a single machine environment you can omit the container name and just run `vagrant docker-shell`.
 
-`docker-shell` is a shortcut for running Bash in an interactive shell:
+`docker-shell` is a shortcut for `docker-exec` running Bash in an interactive shell:
 ```bash
 vagrant docker-exec -t nginx -- bash
 ```
@@ -62,38 +55,43 @@ The syntax for `docker-exec` is:
 vagrant docker-exec [options] [container] -- [command] [args]
 ```
 
-Options are:  
---[no-]detach Run in the background  
+Options are:
+--[no-]detach Run in the background
 -t, --[no-]tty Open an interactive shell
 
-Everything after the double hyphen is sent to docker's exec command.
+In a multimachine environment `docker-exec` (and `docker-shell`) must be followed by at least 1 container name defined by `config.vm.define`. For example, for this Vagrantfile
+```ruby
+Vagrant.configure("2") do |config|
+  config.vm.define "web" do |v|
+    v.vm.provider "docker" do |d|
+      d.image   = "dockerfile/nginx"
+      d.ports   = ["8082:80"]
+      d.name    = "nginx"
+      d.vagrant_vagrantfile = "./Vagrantfile.proxy"
+    end
+  end
+end
+```
 
-As an example, to create a new file in a container named `nginx`:
+The container name passed to `docker-exec` is `web` even though a docker assigned the container the name "nginx".
 
+## Examples
+Everything after the double hyphen is sent to docker's exec command. For example, to create a new file in a container named nginx:
 ```bash
-vagrant docker-exec nginx -- touch /var/www/html/test.html
+vagrant docker-exec web -- touch /var/www/html/test.html
 ```
 
 If the command produces output, the output will be prefixed with the name of the container.
 ```bash
-vagrant docker-exec nginx -- ifconfig
-==> nginx: eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:02  
-==> nginx:           inet addr:172.17.0.2  Bcast:0.0.0.0  Mask:255.255.0.0
-==> nginx:           inet6 addr: fe80::42:acff:fe11:2/64 Scope:Link
-==> nginx:           UP BROADCAST RUNNING  MTU:1500  Metric:1
-==> nginx:           RX packets:24 errors:0 dropped:0 overruns:0 frame:0
-==> nginx:           TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
-==> nginx:           collisions:0 txqueuelen:0 
-==> nginx:           RX bytes:1944 (1.9 KB)  TX bytes:648 (648.0 B)
-==> nginx: 
-==> nginx: lo        Link encap:Local Loopback  
+vagrant docker-exec nginx nginx2 -- ifconfig | grep inet
+==> nginx:           inet addr:172.17.0.5  Bcast:0.0.0.0  Mask:255.255.0.0
+==> nginx:           inet6 addr: fe80::42:acff:fe11:5/64 Scope:Link
 ==> nginx:           inet addr:127.0.0.1  Mask:255.0.0.0
 ==> nginx:           inet6 addr: ::1/128 Scope:Host
-==> nginx:           UP LOOPBACK RUNNING  MTU:65536  Metric:1
-==> nginx:           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
-==> nginx:           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-==> nginx:           collisions:0 txqueuelen:0 
-==> nginx:           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+==> nginx2:           inet addr:172.17.0.4  Bcast:0.0.0.0  Mask:255.255.0.0
+==> nginx2:           inet6 addr: fe80::42:acff:fe11:4/64 Scope:Link
+==> nginx2:           inet addr:127.0.0.1  Mask:255.0.0.0
+==> nginx2:           inet6 addr: ::1/128 Scope:Host
 ```
 
 The name of the container is only required for interactive shells. To run a command on multiple running containers, omit the container name:
@@ -101,6 +99,11 @@ The name of the container is only required for interactive shells. To run a comm
 vagrant docker-exec -- hostname
 ==> nginx: 231e57e57825
 ==> nginx2: 6ebced94866b
+```
+
+You can also specify containers as you would any other vagrant command:
+```bash
+vagrant docker-exec /nginx\d?/ -- ps aux | grep www-data
 ```
 
 Note that all exec commands run by docker are run as the root user.

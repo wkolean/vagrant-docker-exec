@@ -25,13 +25,11 @@ module VagrantPlugins
 
         with_target_vms(argv, target_opts) do |machine|
           command = ["docker", "exec", "-it"]
-          command << machine.name.to_s
+          command << machine.id.to_s
           command << "bash"
-          
-          output = ""
-          machine.provider.driver.execute(*command, options) do |type, data|
-            output += data
-          end
+
+          machine.provider.driver.execute(*command, options)
+
         end
 
         return 0

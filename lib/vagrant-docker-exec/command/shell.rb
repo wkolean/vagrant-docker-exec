@@ -8,9 +8,10 @@ module VagrantPlugins
       def execute
 
         options = {}
-        options[:detach]  = false
-        options[:pty]     = true
-        options[:stdin]   = true
+        options[:detach]    = false
+        options[:pty]       = true
+        options[:stdin]     = true
+        options[:new_line]  = false
 
         opts = OptionParser.new do |o|
           o.banner = "Usage: vagrant docker-shell [container]"
@@ -24,15 +25,23 @@ module VagrantPlugins
         target_opts[:single_target] = options[:pty]
 
         with_target_vms(argv, target_opts) do |machine|
+          if machine.state.id != :running
+            @env.ui.info("#{machine.name.to_s} is not running.")
+            next
+          end
+
           command = ["docker", "exec", "-it"]
           command << machine.id.to_s
           command << "bash"
 
-          machine.provider.driver.execute(*command, options)
+          #machine.provider.driver.execute(*command, options)
+          machine.provider.driver.execute(*command, options) do |type, data|
+            @env.ui.detail(data.chomp, **options)
+          end
 
         end
 
-        return 0
+        #return 0
       end
 
     end

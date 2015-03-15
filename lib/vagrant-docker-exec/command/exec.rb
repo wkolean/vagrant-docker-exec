@@ -50,7 +50,7 @@ module VagrantPlugins
 
         with_target_vms(argv, target_opts) do |machine|
           if machine.state.id != :running
-            @env.ui.info("#{machine.id} is not running.")
+            @env.ui.info("#{machine.name.to_s} is not running.")
             next
           end
 
@@ -75,13 +75,19 @@ module VagrantPlugins
 
         #@env.ui.info(exec_cmd.flatten)
 
+        output_options = {}
+        output_options[:stdin]     = true
+        output_options[:new_line]  = false
+        output_options[:prefix]    = false
+
         output = ""
         machine.provider.driver.execute(*exec_cmd, exec_options) do |type, data|
-          output += data
+          #output += data
+          @env.ui.detail(data.chomp, **output_options)
         end
 
-        output_options = {}
-        machine.ui.output(output.chomp!, **output_options) if !output.empty?
+        #machine.ui.output(output.chomp!, **output_options) if !output.empty?
+        #@env.ui.detail(output.chomp, **output_options)
 
       end
 

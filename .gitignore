@@ -3,3 +3,5 @@ Gemfile.lock
 Vagrantfile*
 www
 pkg
+*.sublime-project
+*.sublime-workspace
